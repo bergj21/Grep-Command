@@ -1,0 +1,171 @@
+/**********************************************************
+* Project 4: Gerp
+* CS 15
+* README
+* Author: John Berg & Tomer Wenderow
+*********************************************************/
+
+B. Program Purpose:
+
+    The purpose of this program is to find all the locations and sentences 
+    that a word appears in a directory of text files. The user inputs a query 
+    and the program prints all appearances of this word to a separate output 
+    file. The user may query for an insensitive, sensitive search,
+    or change the output file.
+
+C. Acknowledgements: 
+
+www.cplusplus.com
+
+D. Files: 
+
+main.cpp:
+    Parse command line arguements and call appropriate function.
+
+gerp.cpp:
+    The gerp implementation that traverses directories, fills hash table, and 
+    handles command loop.
+
+gerp.h:
+    Interface for the gerp class.
+
+hashTable.cpp:
+    implementation for the hashTable class. The hashTable class constructs
+    a hash table that is used in the gerp class. The hash table has the public
+    functions access and insert which access values of the table and add 
+    values, respectively
+    
+hashTable.h:
+    Interface for the hashTable class.
+
+DirNode.h:
+    Interface for the DirNode class. DirNodes are the nodes used for
+    the FSTree
+
+FSTree.h:
+    Interface for the FSTree class, which makes a tree data srtructure 
+    modelling the inputted directory
+    
+output.txt:
+    File utilized to take reference implementation output.
+
+out.txt:
+    File utilized to take gerp output.
+
+E. Compile/run:
+    - Compile using
+            make or make gerp
+    - run executable with 
+            ./gerp directory outputFile
+
+F. Architectural Overview
+
+The hashTable implementation is the class for our ADT of this project. Our hash 
+table is an array of pointers to wordNodes. Each wordNode stores a string to a 
+word (a key), a vector of pointers to pathData structs. Each pathData stores a 
+pointer to the string path, int line number, and string line of each instance 
+of that word. The gerp implementation constructs two hash tables, an 
+insensitive and a sensitive one. Additionally, the gerp class utilizes the hash 
+table to perform the main operations of the grep command.  
+In the FSTreeTraversal function, the tree of the inputted directory is 
+traversed, and each file is traversed word by word, inserting the word into 
+each hash table appropriately. 
+
+G. Data Structures
+
+Hash Table:
+A hash table is an ADT that is used for implementing dictionaries by
+storing key-value pairs. A hash table uses a hash function to compute an index 
+into an array that stores the value associated with that key. A hash table was 
+extremely important for this project due to the key-value associations and, 
+more importantly, the O(1) access, insertion, and deletion. The O(1) time 
+complexity of the hash table allows the program to be much more efficient than 
+the other data structures we've learned thus far. 
+
+Algorithms:
+We used quadratic probing to avoid collisions within our hash table. 
+If we had a collision, the index would be recomputed as 
+ (hash_value + attempt^2) % capacity until an open bucket is found.
+
+
+Vector:
+We utilized vectors, built in c++ data structure, for this assignment. They 
+perform nearly to the ArrayLists we implemented in week 1. Vectors use a 
+dynamically stored array to store their elements. Using the built in vector 
+methods, inserting and removing elements was very simple. We used vectors
+for every instance we needed a list. This included a vector of pathData
+in the wordNode struct to hold a list of every instance of the same word
+and two vectors to keep track of allocated memory in the gerp class.
+
+Struct:
+Structs are data structures used to group data of potentially different data 
+types under a single name. We made two structs: the pathData struct and the 
+wordNode struct. The pathData struct contained pointers to a word's path, line
+number, and sentence. The wordNode struct held the word itself and a vector of
+pointers to pathData structs. The structs made it much easier to consolidate 
+data that went together such as the word and its path, which meant that we 
+didn't need to traverse each file again when searching for a word. 
+
+
+H. Testing
+Week One Testing:
+We tested the two functions from week 1 using our own main file and checking
+the output that was produced. More specifically, the job of FSTreeTraversal was
+to print the proper path names of all files in a directory. First, we created 
+our own test directory with various sub directories and files. When we ran our
+FSTreeTraversal, we checked that the correct paths were being printed to cout 
+and that they followed the rules of the spec. We ran into slight issues in 
+which the name of a directory or a "/" would print twice. We caught these
+issues and adjusted accordingly until we had a properly running 
+FSTreeTraversal. In terms of stringProcessing, we also utilized a main in 
+which we tested with various string inputs and checked the output on cout. Our
+tests consisted of inputting strings with a variety of non alpha numeric 
+characters at the beginning and end, and making sure that they were stripped
+from the string. Additionally, we made sure that non alpha numeric characters
+in the middle of alpha numeric characters were not being stripped. Some of our
+remaining main testing code may be found in the phase one submission.
+
+Week Two Testing:  
+Similar to week 1, the majority of our testing occured through main and 
+comparing our output to that of the reference's. As we were working on building
+our hash table, we often included cout and cerr statements throughout to see
+what was occuring and make sure that it was doing as intended. In a main file, 
+we created an instance of a hash table and tested the insertion and access 
+of our table. Once we had a functioning hash table, we moved onto the gerp 
+class which was much more straight forward. We quickly built a command loop
+and readjusted our FSTreeTraversal function to work with the gerp class. 
+With a mostly functioning gerp and hash table class, we began testing using
+our own small directory of text files. We ran the program with our testing 
+files and made sure that we were able to access and print properly. 
+Eventually, we worked our way up to larger files such as smallGutenberg. It was
+at this portion of the project in which we ran into errors on the larger
+directories. We added cerr statements in many places to pinpoint the location 
+and the majority of our issues often stemmed from our expand function. We
+adjusted the potential erros accordingly, and reran our program again. This 
+process remained the same until our program was properly running on directories
+such as smallGutenberg and mediumGutenberg. 
+
+Once we had a functioning gerp program, we used diff testing to 
+compare our output to that of the reference. Included are the output files 
+out.txt and output.txt, which compare output for the queries 
+"@i we" followed by "we" on smallGutenberg for gerp and the_gerp, respectively.
+Since the files' diff returned no differences, it was clear that our query was
+correct. We also tested edge cases such as a string not being found in the
+sensitive or insensitive search, and using non alpha numerics in the queried
+word for btoh sensitive and insenstive searches. These queries were done on
+both the reference and our gerp. Output to cout was diffed by
+redirecting cout output to a file and then a diff was perfored with the
+reference's cout output. Output files are empty because they were too 
+large to be submitted
+
+At this point we determined we had a functioning gerp program on files
+like small and medium Gutenberg, but largeGutenberg was not even running under
+20 minutes. We realized that we were storing copies of the same value
+(such as pathName, line #, and sentences) and this redundancy was costing
+us a lot of space and time. Thus, we reconfigured our program so that, instead
+of storing copies of these values, we stored pointers to them. Essentially, 
+we eliminated many of the redundant areas of our program. By doing so, we
+reduced the amount of space on the heap and this reduced our run time 
+significantly. After reconfiguring, we needed to find an efficient way to 
+recycle all this memory, but with the help of valgrind we were able to 
+test our program and implement a working destructor. 
